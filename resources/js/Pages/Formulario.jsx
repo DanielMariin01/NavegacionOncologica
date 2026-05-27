@@ -30,7 +30,7 @@ export default function Registro() {
         <AuthenticatedLayout>
             <Head title="Registro de Paciente" />
 
-            <div className="max-w-4xl mx-auto py-10 px-6">
+            <div className="max-w-6xl mx-auto py-12 px-6">
                 <h1 className="text-xl font-bold text-white mb-8 bg-blue-500 px-6 py-3">
                     Registro de paciente
                 </h1>
