@@ -16,7 +16,8 @@ export default function Registro() {
         telefono: '',
         telefono2: '',
         correo: '',
-        archivo: null,
+        historiaClinica: null,
+        patologia: null,
     });
 
     const submit = (e) => {
@@ -25,7 +26,12 @@ export default function Registro() {
     };
 
     const inputClass = "peer py-2.5 pe-0 ps-8 block w-full bg-transparent border-t-transparent border-b-2 border-x-transparent border-b-gray-300 text-base text-gray-900 placeholder:text-gray-400 focus:border-t-transparent focus:border-x-transparent focus:border-b-teal-400 focus:ring-0 focus:outline-none disabled:opacity-50";
-
+    const getInputClass = (value) => {
+        const base = "peer py-2.5 pe-0 ps-8 block w-full border-t-transparent border-b-2 border-x-transparent text-base focus:border-t-transparent focus:border-x-transparent focus:border-b-teal-400 focus:ring-0 focus:outline-none disabled:opacity-50 transition-colors duration-300";
+        return value
+            ? `${base} bg-teal-50 border-b-teal-400 text-teal-700`
+            : `${base} bg-transparent border-b-gray-300 text-gray-900 placeholder:text-gray-400`;
+    };
     const iconClass = "absolute inset-y-0 start-0 flex items-center pointer-events-none ps-2 text-gray-400";
 
     return (
@@ -47,7 +53,7 @@ export default function Registro() {
                                 <select
                                     value={data.tipo_documento}
                                     onChange={e => setData('tipo_documento', e.target.value)}
-                                    className={inputClass}
+                                    className={getInputClass(data.tipo_documento)}
                                 >
                                     <option value="" disabled>Tipo de documento</option>
                                     <option value="CC">Cédula de ciudadanía</option>
@@ -68,7 +74,7 @@ export default function Registro() {
                                     placeholder="Número de documento"
                                     value={data.numero_documento}
                                     onChange={e => setData('numero_documento', e.target.value)}
-                                    className={inputClass}
+                                  className={getInputClass(data.numero_documento)}
                                 />
                                 {errors.numero_documento && <p className="text-red-500 text-xs mt-1">{errors.numero_documento}</p>}
                             </div>
@@ -83,7 +89,7 @@ export default function Registro() {
                                 placeholder="Nombre completo"
                                 value={data.nombre_completo}
                                 onChange={e => setData('nombre_completo', e.target.value)}
-                                className={inputClass}
+                                className={getInputClass(data.nombre_completo)}
                             />
                             {errors.nombre_completo && <p className="text-red-500 text-xs mt-1">{errors.nombre_completo}</p>}
                         </div>
@@ -205,20 +211,41 @@ export default function Registro() {
                                 {errors.correo && <p className="text-red-500 text-xs mt-1">{errors.correo}</p>}
                             </div>
                         </div>
-                        {/* Archivo */}
-                        <div className="relative">
-                            <label className="block text-base text-gray-400 mb-1 ps-8">
-                                Subir historia clinica
-                            </label>
-                            <div className={iconClass} style={{ top: '28px' }}>
-                                <svg xmlns="http://www.w3.org/2000/svg" className="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="17 8 12 3 7 8" /><line x1="12" x2="12" y1="3" y2="15" /></svg>
+
+
+                        <div className="grid grid-cols-2 gap-6">
+                            {/* HISTORIA CLINICA  */}
+                            <div className="relative">
+                                <label className="block text-base text-gray-400 mb-1 ps-8">
+                                    Subir historia clinica
+                                </label>
+                                <div className={iconClass} style={{ top: '28px' }}>
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="17 8 12 3 7 8" /><line x1="12" x2="12" y1="3" y2="15" /></svg>
+                                </div>
+                                <input
+                                    type="file"
+                                    onChange={e => setData('historiaClinica', e.target.files[0])}
+                                    className="ps-8 block w-full text-sm text-gray-400 border-b-2 border-gray-300 bg-transparent focus:outline-none focus:border-b-teal-400 file:mr-4 file:py-1 file:px-3 file:rounded-full file:border-0 file:text-base file:bg-teal-200 file:text-teal-600 hover:file:bg-teal-300"
+                                />
+                                {errors.historiaClinica && <p className="text-red-500 text-xs mt-1">{errors.historiaClinica}</p>}
                             </div>
-                            <input
-                                type="file"
-                                onChange={e => setData('archivo', e.target.files[0])}
-                                className="ps-8 block w-full text-sm text-gray-400 border-b-2 border-gray-300 bg-transparent focus:outline-none focus:border-b-teal-400 file:mr-4 file:py-1 file:px-3 file:rounded-full file:border-0 file:text-xs file:bg-teal-50 file:text-teal-600 hover:file:bg-teal-100"
-                            />
-                            {errors.archivo && <p className="text-red-500 text-xs mt-1">{errors.archivo}</p>}
+
+                            {/* PATOLOGIA*/}
+                            <div className="relative">
+                                <label className="block text-base text-gray-400 mb-1 ps-8">
+                                    Subir patología
+                                </label>
+                                <div className={iconClass} style={{ top: '28px' }}>
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="17 8 12 3 7 8" /><line x1="12" x2="12" y1="3" y2="15" /></svg>
+                                </div>
+                                <input
+                                    type="file"
+                                    onChange={e => setData('patologia', e.target.files[0])}
+                                    className="ps-8 block w-full text-sm text-gray-400 border-b-2 border-gray-300 bg-transparent focus:outline-none focus:border-b-teal-400 file:mr-4 file:py-1 file:px-3 file:rounded-full file:border-0 file:text-base file:bg-teal-200 file:text-teal-600 hover:file:bg-teal-300"
+                                />
+                                {errors.patologia && <p className="text-red-500 text-xs mt-1">{errors.patologia}</p>}
+                            </div>
+
                         </div>
 
                         {/* Botón */}
