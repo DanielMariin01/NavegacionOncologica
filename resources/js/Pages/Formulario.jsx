@@ -113,7 +113,7 @@ export default function Registro() {
                                     type="date"
                                     value={data.fecha_nacimiento}
                                     onChange={e => setData('fecha_nacimiento', e.target.value)}
-                                    className={inputClass}
+                                    className={getInputClass(data.fecha_nacimiento)}
                                 />
                                 {errors.fecha_nacimiento && <p className="text-red-500 text-xs mt-1">{errors.fecha_nacimiento}</p>}
                             </div>
@@ -130,7 +130,7 @@ export default function Registro() {
                                     placeholder=""
                                     value={data.edad}
                                     onChange={e => setData('edad', e.target.value)}
-                                    className={inputClass}
+                                    className={getInputClass(data.edad)}
                                 />
                                 {errors.edad && <p className="text-red-500 text-xs mt-1">{errors.edad}</p>}
                             </div>
@@ -145,7 +145,7 @@ export default function Registro() {
                                     <select
                                         value={data.sexo}
                                         onChange={e => setData('sexo', e.target.value)}
-                                        className={inputClass}
+                                        className={getInputClass(data.sexo)}
                                     >
                                         <option value="" disabled>Selecione...</option>
                                         <option value="M">Masculino</option>
@@ -170,7 +170,7 @@ export default function Registro() {
                                     placeholder="Teléfono principal"
                                     value={data.telefono}
                                     onChange={e => setData('telefono', e.target.value)}
-                                    className={inputClass}
+                                    className={getInputClass(data.telefono)}
                                 />
                                 {errors.telefono && <p className="text-red-500 text-xs mt-1">{errors.telefono}</p>}
                             </div>
@@ -184,7 +184,7 @@ export default function Registro() {
                                     placeholder="Teléfono secundario (opcional)"
                                     value={data.telefono2}
                                     onChange={e => setData('telefono2', e.target.value)}
-                                    className={inputClass}
+                                    className={getInputClass(data.telefono2)}
                                 />
                                 {errors.telefono2 && <p className="text-red-500 text-xs mt-1">{errors.telefono2}</p>}
                             </div>
@@ -198,7 +198,7 @@ export default function Registro() {
                                     placeholder="Correo electrónico"
                                     value={data.correo}
                                     onChange={e => setData('correo', e.target.value)}
-                                    className={inputClass}
+                                     className={getInputClass(data.correo)}
                                 />
                                 {errors.correo && <p className="text-red-500 text-xs mt-1">{errors.correo}</p>}
                             </div>
@@ -221,7 +221,7 @@ export default function Registro() {
                                     type="date"
                                     value={data.fecha_diagnostico}
                                     onChange={e => setData('fecha_diagnostico', e.target.value)}
-                                    className={inputClass}
+                                     className={getInputClass(data.fecha_diagnostico)}
                                 />
                                 {errors.fecha_diagnostico && <p className="text-red-500 text-xs mt-1">{errors.fecha_diagnostico}</p>}
                             </div>
