@@ -34,6 +34,18 @@ export default function Registro() {
     };
     const iconClass = "absolute inset-y-0 start-0 flex items-center pointer-events-none ps-2 text-gray-400";
 
+    const calcularEdad = (fecha) => {
+        if (!fecha) return;
+        const hoy = new Date();
+        const nacimiento = new Date(fecha);
+        let edad = hoy.getFullYear() - nacimiento.getFullYear();
+        const mes = hoy.getMonth() - nacimiento.getMonth();
+        if (mes < 0 || (mes === 0 && hoy.getDate() < nacimiento.getDate())) {
+            edad--;
+        }
+        setData(data => ({ ...data, fecha_nacimiento: fecha, edad: edad.toString() }));
+    };
+
     return (
         <AuthenticatedLayout>
             <Head title="Registro de Paciente" />
@@ -112,7 +124,7 @@ export default function Registro() {
                                 <input
                                     type="date"
                                     value={data.fecha_nacimiento}
-                                    onChange={e => setData('fecha_nacimiento', e.target.value)}
+                                    onChange={e => calcularEdad(e.target.value)}
                                     className={getInputClass(data.fecha_nacimiento)}
                                 />
                                 {errors.fecha_nacimiento && <p className="text-red-500 text-xs mt-1">{errors.fecha_nacimiento}</p>}
@@ -129,31 +141,32 @@ export default function Registro() {
                                     type="number"
                                     placeholder=""
                                     value={data.edad}
+                                    readOnly
                                     onChange={e => setData('edad', e.target.value)}
                                     className={getInputClass(data.edad)}
                                 />
                                 {errors.edad && <p className="text-red-500 text-xs mt-1">{errors.edad}</p>}
                             </div>
-                            <div className="grid grid-cols-2 gap-6">
-                                <div className="relative">
-                                    <label className="block text-base text-gray-400 mb-1 ps-8">
-                                        Sexo
-                                    </label>
-                                    <div className={iconClass} style={{ top: '28px' }}>
-                                        <svg xmlns="http://www.w3.org/2000/svg" className="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="4" /><path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32 1.41 1.41M2 12h2m16 0h2M4.93 19.07l1.41-1.41M18.66 5.34l1.41-1.41" /></svg>
-                                    </div>
-                                    <select
-                                        value={data.sexo}
-                                        onChange={e => setData('sexo', e.target.value)}
-                                        className={getInputClass(data.sexo)}
-                                    >
-                                        <option value="" disabled>Selecione...</option>
-                                        <option value="M">Masculino</option>
-                                        <option value="F">Femenino</option>
-                                    </select>
-                                    {errors.sexo && <p className="text-red-500 text-xs mt-1">{errors.sexo}</p>}
+
+                            <div className="relative">
+                                <label className="block text-base text-gray-400 mb-1 ps-8">
+                                    Sexo
+                                </label>
+                                <div className={iconClass} style={{ top: '28px' }}>
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="4" /><path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32 1.41 1.41M2 12h2m16 0h2M4.93 19.07l1.41-1.41M18.66 5.34l1.41-1.41" /></svg>
                                 </div>
+                                <select
+                                    value={data.sexo}
+                                    onChange={e => setData('sexo', e.target.value)}
+                                    className={getInputClass(data.sexo)}
+                                >
+                                    <option value="" disabled>Selecione...</option>
+                                    <option value="M">Masculino</option>
+                                    <option value="F">Femenino</option>
+                                </select>
+                                {errors.sexo && <p className="text-red-500 text-xs mt-1">{errors.sexo}</p>}
                             </div>
+
                         </div>
 
                         <h2 className="text-sm font-semibold text-teal-700 uppercase tracking-wider mb-2 mt-4">
@@ -198,7 +211,7 @@ export default function Registro() {
                                     placeholder="Correo electrónico"
                                     value={data.correo}
                                     onChange={e => setData('correo', e.target.value)}
-                                     className={getInputClass(data.correo)}
+                                    className={getInputClass(data.correo)}
                                 />
                                 {errors.correo && <p className="text-red-500 text-xs mt-1">{errors.correo}</p>}
                             </div>
@@ -221,7 +234,7 @@ export default function Registro() {
                                     type="date"
                                     value={data.fecha_diagnostico}
                                     onChange={e => setData('fecha_diagnostico', e.target.value)}
-                                     className={getInputClass(data.fecha_diagnostico)}
+                                    className={getInputClass(data.fecha_diagnostico)}
                                 />
                                 {errors.fecha_diagnostico && <p className="text-red-500 text-xs mt-1">{errors.fecha_diagnostico}</p>}
                             </div>
