@@ -82,7 +82,6 @@ export default function Registro() {
                                 {errors.numero_documento && <p className="text-red-500 text-xs mt-1">{errors.numero_documento}</p>}
                             </div>
                         </div>
-
                         <div className="relative">
                             <div className={iconClass}>
                                 <svg xmlns="http://www.w3.org/2000/svg" className="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" /></svg>
@@ -91,11 +90,13 @@ export default function Registro() {
                                 type="text"
                                 placeholder="Nombre completo"
                                 value={data.nombre_completo}
-                                onChange={e => setData('nombre_completo', e.target.value)}
+                                onChange={e => setData('nombre_completo', e.target.value.toUpperCase())}
                                 className={getInputClass(data.nombre_completo)}
                             />
                             {errors.nombre_completo && <p className="text-red-500 text-xs mt-1">{errors.nombre_completo}</p>}
                         </div>
+
+
                         <h2 className="text-sm font-semibold text-teal-700 uppercase tracking-wider mb-2 mt-4">
                             Datos personales
                         </h2>
