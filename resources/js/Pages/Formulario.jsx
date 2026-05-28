@@ -1,7 +1,8 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, useForm } from '@inertiajs/react';
-import AuthBackground from '@/Components/AuthBackground';
-import Background from '@/Components/Background';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
+import { es } from 'date-fns/locale';
 
 
 export default function Registro() {
@@ -121,10 +122,18 @@ export default function Registro() {
                                 <div className={iconClass} style={{ top: '28px' }}>
                                     <svg xmlns="http://www.w3.org/2000/svg" className="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="18" height="18" x="3" y="4" rx="2" ry="2" /><line x1="16" x2="16" y1="2" y2="6" /><line x1="8" x2="8" y1="2" y2="6" /><line x1="3" x2="21" y1="10" y2="10" /></svg>
                                 </div>
-                                <input
-                                    type="date"
-                                    value={data.fecha_nacimiento}
-                                    onChange={e => calcularEdad(e.target.value)}
+                                <DatePicker
+                                    selected={data.fecha_nacimiento ? new Date(data.fecha_nacimiento) : null}
+                                    onChange={(date) => {
+                                        const formatted = date.toISOString().split('T')[0];
+                                        calcularEdad(formatted);
+                                    }}
+                                    dateFormat="dd/MM/yyyy"
+                                    locale={es}
+                                    showYearDropdown
+                                    scrollableYearDropdown
+                                    yearDropdownItemNumber={100}
+                                    placeholderText="dd/mm/aaaa"
                                     className={getInputClass(data.fecha_nacimiento)}
                                 />
                                 {errors.fecha_nacimiento && <p className="text-red-500 text-xs mt-1">{errors.fecha_nacimiento}</p>}
@@ -230,10 +239,18 @@ export default function Registro() {
                                 <div className={iconClass} style={{ top: '28px' }}>
                                     <svg xmlns="http://www.w3.org/2000/svg" className="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="18" height="18" x="3" y="4" rx="2" ry="2" /><line x1="16" x2="16" y1="2" y2="6" /><line x1="8" x2="8" y1="2" y2="6" /><line x1="3" x2="21" y1="10" y2="10" /></svg>
                                 </div>
-                                <input
-                                    type="date"
-                                    value={data.fecha_diagnostico}
-                                    onChange={e => setData('fecha_diagnostico', e.target.value)}
+                                <DatePicker
+                                    selected={data.fecha_diagnostico ? new Date(data.fecha_diagnostico) : null}
+                                    onChange={(date) => {
+                                        const formatted = date.toISOString().split('T')[0];
+                                        setData('fecha_diagnostico', formatted);
+                                    }}
+                                    dateFormat="dd/MM/yyyy"
+                                    locale={es}
+                                    showYearDropdown
+                                    scrollableYearDropdown
+                                    yearDropdownItemNumber={100}
+                                    placeholderText="dd/mm/aaaa"
                                     className={getInputClass(data.fecha_diagnostico)}
                                 />
                                 {errors.fecha_diagnostico && <p className="text-red-500 text-xs mt-1">{errors.fecha_diagnostico}</p>}
