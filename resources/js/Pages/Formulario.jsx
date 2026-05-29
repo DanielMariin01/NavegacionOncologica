@@ -3,10 +3,14 @@ import { Head, useForm } from '@inertiajs/react';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { es } from 'date-fns/locale';
+import Swal from 'sweetalert2';
 
 
 export default function Registro() {
-    const { data, setData, post, processing, errors } = useForm({
+
+
+    const { data, setData, post, processing, errors, reset } = useForm({
+        forceFormData: true,
         nombre_completo: '',
         tipo_documento: '',
         numero_documento: '',
@@ -21,9 +25,87 @@ export default function Registro() {
         patologia: null,
     });
 
+
+
     const submit = (e) => {
         e.preventDefault();
-        post(route('paciente.store'));
+        const tiposPermitidos = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+        const camposVacios = [];
+
+        if (!data.nombre_completo) camposVacios.push('Nombre completo');
+        if (!data.tipo_documento) camposVacios.push('Tipo de documento');
+        if (!data.numero_documento) camposVacios.push('Número de documento');
+        if (!data.edad) camposVacios.push('Edad');
+        if (!data.sexo) camposVacios.push('Sexo');
+        if (!data.fecha_nacimiento) camposVacios.push('Fecha de nacimiento');
+        if (!data.telefono) camposVacios.push('Teléfono principal');
+
+        if (camposVacios.length > 0) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Campos obligatorios',
+                html: `Por favor completa los siguientes campos:<br>${camposVacios.join('<br>')}</b>`
+            });
+            return;
+        }
+
+        if (data.historiaClinica && !tiposPermitidos.includes(data.historiaClinica.type)) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Archivo no permitido',
+                text: 'La historia clínica solo puede ser PDF o Word.',
+            });
+            return;
+        }
+
+        if (data.patologia && !tiposPermitidos.includes(data.patologia.type)) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Archivo no permitido',
+                text: 'La patología solo puede ser PDF o Word.',
+            });
+            return;
+        }
+
+
+        post(route('paciente.store'), {
+            onBefore: () => {
+                Swal.fire({
+                    title: 'Registrando Paciente',
+                    allowOutsideClick: false,
+                    allowEscapeKey: false,
+                    showConfirmButton: false,
+                    background: '#fff',
+                    html: `
+            <div style="display:flex;flex-direction:column;align-items:center;gap:16px;padding:8px 0">
+                <div style="display:flex;gap:12px;align-items:center;">
+                    <div style="width:20px;height:20px;background:#4DCFCF;border-radius:50%;animation:bounce 1.2s ease-in-out infinite;animation-delay:0s;"></div>
+                    <div style="width:20px;height:20px;background:#4DCFCF;border-radius:50%;animation:bounce 1.2s ease-in-out infinite;animation-delay:0.2s;"></div>
+                    <div style="width:20px;height:20px;background:#4DCFCF;border-radius:50%;animation:bounce 1.2s ease-in-out infinite;animation-delay:0.4s;"></div>
+                </div>
+                <p style="color:#9ca3af;font-size:12px;margin:0">Por favor espera un momento...</p>
+            </div>
+            <style>@keyframes bounce{0%, 100%{transform:translateY(0);opacity:.4}50%{transform:translateY(-10px);opacity:1}}</style>
+            `,
+                });
+            },
+            onSuccess: () => {
+                reset();
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Registro exitoso',
+                    text: 'El paciente fue registrado correctamente.',
+                });
+            },
+
+            onError: () => {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Ocurrió un error al registrar el paciente.',
+                });
+            },
+        });
     };
 
     const inputClass = "peer py-2.5 pe-0 ps-8 block w-full bg-transparent border-t-transparent border-b-2 border-x-transparent border-b-gray-300 text-base text-gray-900 placeholder:text-gray-400 focus:border-t-transparent focus:border-x-transparent focus:border-b-teal-400 focus:ring-0 focus:outline-none disabled:opacity-50";
