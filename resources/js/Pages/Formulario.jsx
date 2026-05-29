@@ -72,7 +72,7 @@ export default function Registro() {
         post(route('paciente.store'), {
             onBefore: () => {
                 Swal.fire({
-                    title: 'Registrando Paciente',
+                    title: 'Registrando Paciente...',
                     allowOutsideClick: false,
                     allowEscapeKey: false,
                     showConfirmButton: false,
@@ -131,7 +131,11 @@ export default function Registro() {
         }
         setData(data => ({ ...data, fecha_nacimiento: fecha, edad: edad.toString() }));
     };
-
+    const soloNumeros = (e) => {
+        if (!/[0-9]/.test(e.key) && !['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab'].includes(e.key)) {
+            e.preventDefault();
+        }
+    };
 
     const historiaClinicaRef = useRef(null);
     const patologiaRef = useRef(null);
@@ -179,10 +183,10 @@ export default function Registro() {
                                     <svg xmlns="http://www.w3.org/2000/svg" className="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 7V4h16v3" /><path d="M9 20h6" /><path d="M12 4v16" /></svg>
                                 </div>
                                 <input
-                                    type="number"
+                                    type="text"
                                     placeholder="Número de documento"
                                     value={data.numero_documento}
-                                    onChange={e => setData('numero_documento', e.target.value)}
+                                    onChange={e => setData('numero_documento', e.target.value.toUpperCase())}
                                     className={getInputClass(data.numero_documento)}
                                 />
                                 {errors.numero_documento && <p className="text-red-500 text-xs mt-1">{errors.numero_documento}</p>}
@@ -285,6 +289,7 @@ export default function Registro() {
                                     type="tel"
                                     placeholder="Teléfono principal"
                                     value={data.telefono}
+                                    onKeyDown={soloNumeros}
                                     onChange={e => setData('telefono', e.target.value)}
                                     className={getInputClass(data.telefono)}
                                 />
@@ -299,6 +304,7 @@ export default function Registro() {
                                     type="tel"
                                     placeholder="Teléfono secundario (opcional)"
                                     value={data.telefono2}
+                                    onKeyDown={soloNumeros}
                                     onChange={e => setData('telefono2', e.target.value)}
                                     className={getInputClass(data.telefono2)}
                                 />

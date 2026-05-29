@@ -98,7 +98,7 @@ export default function Login({ status, canResetPassword }) {
                         </div>
 
                         <PrimaryButton className="w-full justify-center py-2.5" disabled={processing}>
-                            Iniciar sesión
+                            {processing ? 'Ingresando...' : 'Iniciar sesión'}
                         </PrimaryButton>
                     </form>
                 </div>
