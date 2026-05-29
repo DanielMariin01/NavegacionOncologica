@@ -4,6 +4,7 @@ import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { es } from 'date-fns/locale';
 import Swal from 'sweetalert2';
+import { useRef } from 'react';
 
 
 export default function Registro() {
@@ -91,6 +92,8 @@ export default function Registro() {
             },
             onSuccess: () => {
                 reset();
+                historiaClinicaRef.current.value = '';
+                patologiaRef.current.value = '';
                 Swal.fire({
                     icon: 'success',
                     title: 'Registro exitoso',
@@ -129,6 +132,9 @@ export default function Registro() {
         setData(data => ({ ...data, fecha_nacimiento: fecha, edad: edad.toString() }));
     };
 
+
+    const historiaClinicaRef = useRef(null);
+    const patologiaRef = useRef(null);
     return (
         <AuthenticatedLayout>
             <Head title="Registro de Paciente" />
@@ -215,6 +221,7 @@ export default function Registro() {
                                         const formatted = date.toISOString().split('T')[0];
                                         calcularEdad(formatted);
                                     }}
+                                    maxDate={new Date()}
                                     dateFormat="dd/MM/yyyy"
                                     locale={es}
                                     showYearDropdown
@@ -332,6 +339,7 @@ export default function Registro() {
                                         const formatted = date.toISOString().split('T')[0];
                                         setData('fecha_diagnostico', formatted);
                                     }}
+                                    maxDate={new Date()}
                                     dateFormat="dd/MM/yyyy"
                                     locale={es}
                                     showYearDropdown
@@ -351,6 +359,7 @@ export default function Registro() {
                                     <svg xmlns="http://www.w3.org/2000/svg" className="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="17 8 12 3 7 8" /><line x1="12" x2="12" y1="3" y2="15" /></svg>
                                 </div>
                                 <input
+                                    ref={historiaClinicaRef}
                                     type="file"
                                     onChange={e => setData('historiaClinica', e.target.files[0])}
                                     className="ps-8 block w-full text-sm text-gray-400 border-b-2 border-gray-300 bg-transparent focus:outline-none focus:border-b-teal-400 file:mr-4 file:py-1 file:px-3 file:rounded-full file:border-0 file:text-base file:bg-teal-200 file:text-teal-600 hover:file:bg-teal-300"
@@ -367,6 +376,7 @@ export default function Registro() {
                                     <svg xmlns="http://www.w3.org/2000/svg" className="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="17 8 12 3 7 8" /><line x1="12" x2="12" y1="3" y2="15" /></svg>
                                 </div>
                                 <input
+                                    ref={patologiaRef}
                                     type="file"
                                     onChange={e => setData('patologia', e.target.files[0])}
                                     className="ps-8 block w-full text-sm text-gray-400 border-b-2 border-gray-300 bg-transparent focus:outline-none focus:border-b-teal-400 file:mr-4 file:py-1 file:px-3 file:rounded-full file:border-0 file:text-base file:bg-teal-200 file:text-teal-600 hover:file:bg-teal-300"

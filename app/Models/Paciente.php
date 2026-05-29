@@ -22,5 +22,7 @@ class Paciente extends Model
         'correo',
         'historia_clinica',
         'patologia',
+        'creado_en',
+        'hora_creado',
     ];
 }

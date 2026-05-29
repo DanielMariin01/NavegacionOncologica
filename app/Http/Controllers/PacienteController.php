@@ -25,6 +25,8 @@ class PacienteController extends Controller
         ]);
 
         $datos = $request->except(['historiaClinica', 'patologia']);
+        $datos['creado_en'] = now()->format('Y-m-d');
+        $datos['hora_creado'] = now()->format('H:i:s');
 
         if ($request->hasFile('historiaClinica')) {
             $datos['historia_clinica'] = $request->file('historiaClinica')
