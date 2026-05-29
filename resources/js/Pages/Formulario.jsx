@@ -72,11 +72,16 @@ export default function Registro() {
                                     className={getInputClass(data.tipo_documento)}
                                 >
                                     <option value="" disabled>Tipo de documento</option>
-                                    <option value="CC">Cédula de ciudadanía</option>
-                                    <option value="TI">Tarjeta de identidad</option>
-                                    <option value="CE">Cédula de extranjería</option>
-                                    <option value="PA">Pasaporte</option>
-                                    <option value="RC">Registro civil</option>
+                                    <option value="TI">TI - Tarjeta de Identidad</option>
+                                    <option value="CC">CC - Cédula de Ciudadanía</option>
+                                    <option value="CE">CE - Cédula de Extranjería</option>
+                                    <option value="PA">PA - Pasaporte</option>
+                                    <option value="CD">CD - Carné Diplomático</option>
+                                    <option value="SC">SC - Salvoconducto de Permanencia</option>
+                                    <option value="PR">PR - Pasaporte de la ONU</option>
+                                    <option value="PE">PE - Permiso Especial de Permanencia</option>
+                                    <option value="AS">AS - Adulto sin Identificación</option>
+                                    <option value="PT">PT - Permiso por Protección Temporal</option>
                                 </select>
                                 {errors.tipo_documento && <p className="text-red-500 text-xs mt-1">{errors.tipo_documento}</p>}
                             </div>
