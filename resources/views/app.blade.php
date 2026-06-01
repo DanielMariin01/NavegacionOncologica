@@ -11,6 +11,7 @@
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="icon" href="/imagenes/logo.png" type="image/png">
 
     <!-- Scripts -->
     @routes
@@ -19,7 +20,7 @@
     @inertiaHead
 </head>
 
-<body class="font-sans antialiased">
+<body class="antialiased">
     @inertia
 </body>
 
