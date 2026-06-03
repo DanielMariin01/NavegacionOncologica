@@ -144,7 +144,7 @@ export default function Registro() {
             <Head title="Registro de Paciente" />
 
             <div className="max-w-6xl mx-auto py-12 px-6">
-                <h1 className="text-xl font-bold text-white  bg-teal-700 px-6 py-3">
+                <h1 className="text-xl font-bold text-white  bg-teal-500 px-6 py-3">
                     Registro de incidencias
                 </h1>
                 <div className="border border-gray-200 rounded-b-lg px-8 py-8 shadow">
@@ -406,7 +406,7 @@ export default function Registro() {
                         <button
                             type="submit"
                             disabled={processing}
-                            className="w-full bg-teal-400 hover:bg-teal-500 text-white font-semibold py-2.5 rounded-lg transition duration-150 mt-4 disabled:opacity-50"
+                            className="w-full bg-cyan-600 hover:bg-cyan-700 text-white font-semibold py-2.5 rounded-lg transition duration-150 mt-4 disabled:opacity-50"
                         >
                             Registrar incidencia
                         </button>
