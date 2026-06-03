@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Paciente;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class PacienteController extends Controller
 {
@@ -20,13 +21,16 @@ class PacienteController extends Controller
             'telefono'         => 'required|string',
             'telefono2'        => 'nullable|string',
             'correo'           => 'nullable|email',
-            'historiaClinica'   => 'nullable|file|mimes:pdf,doc,docx|max:10240',
+            'historiaClinica'  => 'nullable|file|mimes:pdf,doc,docx|max:10240',
             'patologia'        => 'nullable|file|mimes:pdf,doc,docx|max:10240',
         ]);
 
         $datos = $request->except(['historiaClinica', 'patologia']);
         $datos['creado_en'] = now()->format('Y-m-d');
         $datos['hora_creado'] = now()->format('H:i:s');
+        $datos['fk_user'] = Auth::id();
+        $datos['nombre_eps'] = Auth::user()->nombre_eps;
+        $datos['estado'] = 'PENDIENTE';
 
         if ($request->hasFile('historiaClinica')) {
             $datos['historia_clinica'] = $request->file('historiaClinica')
