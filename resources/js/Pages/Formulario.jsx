@@ -24,6 +24,7 @@ export default function Registro() {
         correo: '',
         historiaClinica: null,
         patologia: null,
+        imagenes: null,
     });
 
 
@@ -94,6 +95,7 @@ export default function Registro() {
                 reset();
                 historiaClinicaRef.current.value = '';
                 patologiaRef.current.value = '';
+                imagenesRef.current.value = '';
                 Swal.fire({
                     icon: 'success',
                     title: 'Registro exitoso',
@@ -139,6 +141,7 @@ export default function Registro() {
 
     const historiaClinicaRef = useRef(null);
     const patologiaRef = useRef(null);
+    const imagenesRef = useRef(null);
     return (
         <AuthenticatedLayout>
             <Head title="Registro de Paciente" />
@@ -398,6 +401,22 @@ export default function Registro() {
                                     className="ps-8 block w-full text-sm text-gray-400 border-b-2 border-gray-300 bg-transparent focus:outline-none focus:border-b-teal-400 file:mr-4 file:py-1 file:px-3 file:rounded-full file:border-0 file:text-base file:bg-teal-200 file:text-teal-600 hover:file:bg-teal-300"
                                 />
                                 {errors.patologia && <p className="text-red-500 text-xs mt-1">{errors.patologia}</p>}
+                            </div>
+
+                            {/*IMAGENES*/}
+                            <div className="relative">
+                                <label className="block text-base text-gray-400 mb-1 ps-8">
+                                    Subir imágenes diagnósticas
+                                </label>
+                                <div className={iconClass} style={{ top: '28px' }}>
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="17 8 12 3 7 8" /><line x1="12" x2="12" y1="3" y2="15" /></svg>
+                                </div>
+                                <input
+                                    ref={imagenesRef}
+                                    type="file"
+                                    onChange={e => setData('imagenes', e.target.files[0])}
+                                    className="ps-8 block w-full text-sm text-gray-400 border-b-2 border-gray-300 bg-transparent focus:outline-none focus:border-b-teal-400 file:mr-4 file:py-1 file:px-3 file:rounded-full file:border-0 file:text-base file:bg-teal-200 file:text-teal-600 hover:file:bg-teal-300"
+                                />
                             </div>
 
                         </div>

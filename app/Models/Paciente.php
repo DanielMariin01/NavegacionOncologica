@@ -32,6 +32,7 @@ class Paciente extends Model
         'fecha_revision',
         'fk_user',
         'nombre_eps',
+        'imagenes',
     ];
 
 

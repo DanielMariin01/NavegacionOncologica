@@ -31,4 +31,21 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
+//RUTA PARA SERVIR LOS ARCHIVOS 
+Route::get('/archivo/{tipo}/{archivo}', function ($tipo, $archivo) {
+    $clave = request()->get('clave');
+
+    if ($clave !== env('ARCHIVO_CLAVE_SECRETA')) {
+        abort(403, 'No autorizado');
+    }
+
+    $ruta = storage_path("app/pacientes/{$tipo}/{$archivo}");
+
+    if (!file_exists($ruta)) {
+        abort(404, 'Archivo no encontrado');
+    }
+
+    return response()->file($ruta);
+})->name('archivo.ver');
+
 require __DIR__ . '/auth.php';

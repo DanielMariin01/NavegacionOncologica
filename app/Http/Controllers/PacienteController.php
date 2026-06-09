@@ -23,9 +23,10 @@ class PacienteController extends Controller
             'correo'           => 'nullable|email',
             'historiaClinica'  => 'nullable|file|mimes:pdf,doc,docx|max:10240',
             'patologia'        => 'nullable|file|mimes:pdf,doc,docx|max:10240',
+            'imagenes' => 'nullable|file|mimes:pdf,doc,docx,jpg,jpeg,png|max:10240',
         ]);
 
-        $datos = $request->except(['historiaClinica', 'patologia']);
+        $datos = $request->except(['historiaClinica', 'patologia', 'imagenes']);
         $datos['creado_en'] = now()->format('Y-m-d');
         $datos['hora_creado'] = now()->format('H:i:s');
         $datos['fk_user'] = Auth::id();
@@ -40,6 +41,11 @@ class PacienteController extends Controller
         if ($request->hasFile('patologia')) {
             $datos['patologia'] = $request->file('patologia')
                 ->store('pacientes/patologias', 'local');
+        }
+
+        if ($request->hasFile('imagenes')) {
+            $datos['imagenes'] = $request->file('imagenes')
+                ->store('pacientes/imagenes', 'local');
         }
 
         Paciente::create($datos);
