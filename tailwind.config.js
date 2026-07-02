@@ -14,6 +14,15 @@ export default {
             fontFamily: {
                 sans: ['Poppins', ...defaultTheme.fontFamily.sans],
             },
+            keyframes: {
+                bounceFade: {
+                    '0%, 100%': { transform: 'translateY(0)', opacity: '0.3' },
+                    '50%': { transform: 'translateY(-20px)', opacity: '1' },
+                },
+            },
+            animation: {
+                'bounce-fade': 'bounceFade 0.8s ease-in-out infinite',
+            },
         },
     },
 

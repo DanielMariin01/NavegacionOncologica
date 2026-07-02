@@ -33,7 +33,7 @@ Route::middleware('auth')->group(function () {
 
 //RUTA PARA SERVIR LOS ARCHIVOS 
 Route::get('/archivo/{tipo}/{archivo}', function ($tipo, $archivo) {
-    $clave = request()->get('clave');
+    $clave = request()->header('X-Archivo-Clave');
 
     if ($clave !== env('ARCHIVO_CLAVE_SECRETA')) {
         abort(403, 'No autorizado');
@@ -46,6 +46,6 @@ Route::get('/archivo/{tipo}/{archivo}', function ($tipo, $archivo) {
     }
 
     return response()->file($ruta);
-})->name('archivo.ver');
+});
 
 require __DIR__ . '/auth.php';

@@ -71,26 +71,6 @@ export default function Registro() {
 
 
         post(route('paciente.store'), {
-            onBefore: () => {
-                Swal.fire({
-                    title: 'Registrando Paciente...',
-                    allowOutsideClick: false,
-                    allowEscapeKey: false,
-                    showConfirmButton: false,
-                    background: '#fff',
-                    html: `
-            <div style="display:flex;flex-direction:column;align-items:center;gap:16px;padding:8px 0">
-                <div style="display:flex;gap:12px;align-items:center;">
-                    <div style="width:20px;height:20px;background:#4DCFCF;border-radius:50%;animation:bounce 1.2s ease-in-out infinite;animation-delay:0s;"></div>
-                    <div style="width:20px;height:20px;background:#4DCFCF;border-radius:50%;animation:bounce 1.2s ease-in-out infinite;animation-delay:0.2s;"></div>
-                    <div style="width:20px;height:20px;background:#4DCFCF;border-radius:50%;animation:bounce 1.2s ease-in-out infinite;animation-delay:0.4s;"></div>
-                </div>
-                <p style="color:#9ca3af;font-size:12px;margin:0">Por favor espera un momento...</p>
-            </div>
-            <style>@keyframes bounce{0%, 100%{transform:translateY(0);opacity:.4}50%{transform:translateY(-10px);opacity:1}}</style>
-            `,
-                });
-            },
             onSuccess: () => {
                 reset();
                 historiaClinicaRef.current.value = '';
@@ -102,7 +82,6 @@ export default function Registro() {
                     text: 'El paciente fue registrado correctamente.',
                 });
             },
-
             onError: () => {
                 Swal.fire({
                     icon: 'error',
@@ -145,7 +124,20 @@ export default function Registro() {
     return (
         <AuthenticatedLayout>
             <Head title="Registro de Paciente" />
-
+            {/* OVERLAY PANTALLA COMPLETA */}
+            {processing && (
+                <div className="fixed inset-0 z-[60] flex items-center justify-center bg-slate-200/80">
+                    <div className="flex flex-col items-center gap-4">
+                        <div className="flex gap-3 items-center">
+                            <span className="w-4 h-4 rounded-full bg-cyan-500 animate-bounce-fade [animation-delay:0s]" />
+                            <span className="w-4 h-4 rounded-full bg-cyan-500 animate-bounce-fade [animation-delay:150ms]" />
+                            <span className="w-4 h-4 rounded-full bg-cyan-500 animate-bounce-fade [animation-delay:300ms]" />
+                            <span className="w-4 h-4 rounded-full bg-cyan-500 animate-bounce-fade [animation-delay:450ms]" />
+                        </div>
+                        <p className="text-slate-600 text-xs font-semibold">Registrando paciente...</p>
+                    </div>
+                </div>
+            )}
             <div className="max-w-6xl mx-auto py-12 px-6">
                 <h1 className="text-xl font-bold text-white  bg-teal-500 px-6 py-3">
                     Registro de incidencias
