@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\Paciente;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
 
 class PacienteController extends Controller
 {
@@ -16,7 +19,7 @@ class PacienteController extends Controller
             'apellido1'        => 'required|string|max:100',
             'apellido2'        => 'nullable|string|max:100',
             'tipo_documento'   => 'required|string',
-            'numero_documento' => 'required|string|unique:pacientes,numero_documento',
+            'numero_documento' => 'required|string',
             'edad'             => 'required|integer',
             'sexo'             => 'required|string',
             'fecha_nacimiento' => 'required|date',
@@ -27,6 +30,11 @@ class PacienteController extends Controller
             'historiaClinica'  => 'nullable|file|mimes:pdf,doc,docx|max:10240',
             'patologia'        => 'nullable|file|mimes:pdf,doc,docx|max:10240',
             'imagenes' => 'nullable|file|mimes:pdf,doc,docx,jpg,jpeg,png|max:10240',
+        ]);
+
+        Log::info('Incidencia@store - Inicio de registro', [
+            'user_id'          => Auth::id(),
+            'numero_documento' => $request->input('numero_documento'),
         ]);
 
         $datos = $request->except(['historiaClinica', 'patologia', 'imagenes']);
@@ -51,8 +59,133 @@ class PacienteController extends Controller
                 ->store('pacientes/imagenes', 'local');
         }
 
-        Paciente::create($datos);
+        DB::connection('mysql')->beginTransaction();
+
+        try {
+            $paciente = Paciente::create($datos);
+
+            Log::info('Incidencia@store - Incidencia creada en MySQL local', [
+                'id_paciente'      => $paciente->id_paciente,
+                'numero_documento' => $datos['numero_documento'],
+            ]);
+
+            $existeEnCapbas = DB::connection('sqlsrv')
+                ->table('CAPBAS')
+                ->where('MPCedu', $datos['numero_documento'])
+                ->exists();
+
+            Log::info('Incidencia@store - Verificación en CAPBAS', [
+                'numero_documento' => $datos['numero_documento'],
+                'ya_existe_capbas'  => $existeEnCapbas,
+            ]);
+
+            if (!$existeEnCapbas) {
+                DB::connection('sqlsrv')->table('CAPBAS')->insert([
+                    'MPCedu'   => $datos['numero_documento'],
+                    'MPTDoc'   => $datos['tipo_documento'],
+                    'MPEstPac' => 'S',
+                    'MPNom1'   => strtoupper($datos['nombre1']),
+                    'MPNom2'   => strtoupper($datos['nombre2'] ?? ''),
+                    'MPApe1'   => strtoupper($datos['apellido1']),
+                    'MPApe2'   => strtoupper($datos['apellido2'] ?? ''),
+                    'MPFchN'   => $datos['fecha_nacimiento'],
+                    'MPSexo'   => $datos['sexo'],
+                ]);
+
+                Log::info('Incidencia@store - Paciente creado en CAPBAS', [
+                    'numero_documento' => $datos['numero_documento'],
+                ]);
+            }
+
+            DB::connection('mysql')->commit();
+
+            Log::info('Incidencia@store - Transacción completada exitosamente', [
+                'id_paciente'      => $paciente->id_paciente,
+                'numero_documento' => $datos['numero_documento'],
+            ]);
+        } catch (\Throwable $e) {
+            Log::error('Incidencia@store - Falló el registro, se revierte todo', [
+                'numero_documento' => $datos['numero_documento'] ?? null,
+                'error'             => $e->getMessage(),
+            ]);
+
+            DB::connection('mysql')->rollBack();
+            foreach (['historia_clinica', 'patologia', 'imagenes'] as $campoArchivo) {
+                if (!empty($datos[$campoArchivo]) && Storage::disk('local')->exists($datos[$campoArchivo])) {
+                    Storage::disk('local')->delete($datos[$campoArchivo]);
+                }
+            }
+
+            return back()->withErrors([
+                'general' => 'Ocurrió un error al registrar la incidencia. No se guardó ningún dato.',
+            ])->withInput();
+        }
 
         return redirect()->back()->with('success', 'Paciente registrado correctamente.');
+    }
+
+    public function checkDocumento(string $numeroDocumento)
+    {
+        Log::info('Incidencia@checkDocumento - Verificando documento', [
+            'numero_documento' => $numeroDocumento,
+        ]);
+
+        $ultimaIncidencia = Paciente::where('numero_documento', $numeroDocumento)
+            ->latest('id_paciente')
+            ->first();
+
+        if ($ultimaIncidencia) {
+            Log::info('Incidencia@checkDocumento - Encontrado en historial local', [
+                'numero_documento' => $numeroDocumento,
+            ]);
+
+            return response()->json([
+                'existe'  => true,
+                'origen'  => 'local',
+                'mensaje' => 'Este paciente ya tiene incidencias registradas. Se autocompletaron los datos con su última incidencia.',
+                'datos'   => [
+                    'tipo_documento'   => $ultimaIncidencia->tipo_documento,
+                    'nombre1'          => $ultimaIncidencia->nombre1,
+                    'nombre2'          => $ultimaIncidencia->nombre2,
+                    'apellido1'        => $ultimaIncidencia->apellido1,
+                    'apellido2'        => $ultimaIncidencia->apellido2,
+                    'fecha_nacimiento' => $ultimaIncidencia->fecha_nacimiento,
+                    'sexo'             => $ultimaIncidencia->sexo,
+                ],
+            ]);
+        }
+
+        $registroCapbas = DB::connection('sqlsrv')
+            ->table('CAPBAS')
+            ->where('MPCedu', $numeroDocumento)
+            ->first();
+
+        if ($registroCapbas) {
+            Log::info('Incidencia@checkDocumento - Encontrado en CAPBAS', [
+                'numero_documento' => $numeroDocumento,
+            ]);
+
+            return response()->json([
+                'existe'  => true,
+                'origen'  => 'capbas',
+                'mensaje' => 'Se autocompletaron los datos.',
+                'datos'   => [
+                    'tipo_documento'   => trim($registroCapbas->MPTDoc),
+                    'nombre1'          => trim($registroCapbas->MPNom1),
+                    'nombre2'          => trim($registroCapbas->MPNom2 ?? ''),
+                    'apellido1'        => trim($registroCapbas->MPApe1),
+                    'apellido2'        => trim($registroCapbas->MPApe2 ?? ''),
+                    'fecha_nacimiento' => $registroCapbas->MPFchN,
+                    'sexo'             => trim($registroCapbas->MPSexo),
+                ],
+            ]);
+        }
+
+        return response()->json([
+            'existe'  => false,
+            'origen'  => null,
+            'mensaje' => null,
+            'datos'   => null,
+        ]);
     }
 }

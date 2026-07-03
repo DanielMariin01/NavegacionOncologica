@@ -25,6 +25,10 @@ Route::post('/paciente', [PacienteController::class, 'store'])
     ->name('paciente.store')
     ->middleware('auth');
 
+Route::get('/paciente/verificar/{numeroDocumento}', [PacienteController::class, 'checkDocumento'])
+    ->name('paciente.check')
+    ->middleware('auth');
+
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
@@ -46,6 +50,6 @@ Route::get('/archivo/{tipo}/{archivo}', function ($tipo, $archivo) {
     }
 
     return response()->file($ruta);
-});
+})->middleware('auth');
 
 require __DIR__ . '/auth.php';

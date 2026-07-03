@@ -4,7 +4,8 @@ import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { es } from 'date-fns/locale';
 import Swal from 'sweetalert2';
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
+import axios from 'axios';
 
 
 export default function Registro() {
@@ -30,10 +31,51 @@ export default function Registro() {
         imagenes: null,
     });
 
+    const [verificando, setVerificando] = useState(false);
 
+
+    const verificarDocumento = async () => {
+        if (!data.numero_documento) return;
+
+        setVerificando(true);
+
+        try {
+            const response = await axios.get(route('paciente.check', data.numero_documento));
+            const { existe, origen, mensaje, datos } = response.data;
+
+            if (existe && (origen === 'local' || origen === 'capbas') && datos) {
+                
+                Swal.fire({
+                    icon: 'info',
+                    title: 'El paciente ya existe',
+                    text: mensaje,
+                });
+
+                setData(current => ({
+                    ...current,
+                    tipo_documento: datos.tipo_documento || current.tipo_documento,
+                    nombre1: datos.nombre1 || '',
+                    nombre2: datos.nombre2 || '',
+                    apellido1: datos.apellido1 || '',
+                    apellido2: datos.apellido2 || '',
+                    sexo: datos.sexo || current.sexo,
+                }));
+
+                if (datos.fecha_nacimiento) {
+                    calcularEdad(datos.fecha_nacimiento);
+                }
+            }
+        } catch (error) {
+            console.error('Error verificando documento:', error);
+        } finally {
+            setVerificando(false);
+        }
+    };
 
     const submit = (e) => {
         e.preventDefault();
+
+
         const tiposPermitidos = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
         const camposVacios = [];
 
@@ -239,6 +281,7 @@ export default function Registro() {
                                     placeholder="Número de documento"
                                     value={data.numero_documento}
                                     onChange={e => setData('numero_documento', e.target.value.toUpperCase())}
+                                    onBlur={verificarDocumento}
                                     className={getInputClass(data.numero_documento)}
                                 />
                                 {errors.numero_documento && <p className="text-red-500 text-xs mt-1">{errors.numero_documento}</p>}
@@ -511,7 +554,7 @@ export default function Registro() {
                         {/* Botón */}
                         <button
                             type="submit"
-                            disabled={processing}
+                            disabled={processing || verificando}
                             className="w-full bg-cyan-600 hover:bg-cyan-700 text-white font-semibold py-2.5 rounded-lg transition duration-150 mt-4 disabled:opacity-50"
                         >
                             Registrar incidencia
