@@ -11,7 +11,10 @@ class PacienteController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'nombre_completo'  => 'required|string|max:255',
+            'nombre1'          => 'required|string|max:100',
+            'nombre2'          => 'nullable|string|max:100',
+            'apellido1'        => 'required|string|max:100',
+            'apellido2'        => 'nullable|string|max:100',
             'tipo_documento'   => 'required|string',
             'numero_documento' => 'required|string|unique:pacientes,numero_documento',
             'edad'             => 'required|integer',

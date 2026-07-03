@@ -12,7 +12,10 @@ export default function Registro() {
 
     const { data, setData, post, processing, errors, reset } = useForm({
         forceFormData: true,
-        nombre_completo: '',
+        nombre1: '',
+        nombre2: '',
+        apellido1: '',
+        apellido2: '',
         tipo_documento: '',
         numero_documento: '',
         edad: '',
@@ -34,7 +37,8 @@ export default function Registro() {
         const tiposPermitidos = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
         const camposVacios = [];
 
-        if (!data.nombre_completo) camposVacios.push('Nombre completo');
+        if (!data.nombre1) camposVacios.push('Primer nombre');
+        if (!data.apellido1) camposVacios.push('Primer apellido');
         if (!data.tipo_documento) camposVacios.push('Tipo de documento');
         if (!data.numero_documento) camposVacios.push('Número de documento');
         if (!data.edad) camposVacios.push('Edad');
@@ -113,10 +117,57 @@ export default function Registro() {
         setData(data => ({ ...data, fecha_nacimiento: fecha, edad: edad.toString() }));
     };
     const soloNumeros = (e) => {
-        if (!/[0-9]/.test(e.key) && !['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab'].includes(e.key)) {
+        if (!/[0-9]/.test(e.key) && !['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab', 'Enter', 'ArrowUp', 'ArrowDown'].includes(e.key)) {
             e.preventDefault();
         }
     };
+
+
+
+
+
+
+
+    const formRef = useRef(null);
+
+    const focusAdjacentField = (direction) => {
+        const form = formRef.current;
+        if (!form) return;
+
+        const focusables = Array.from(
+            form.querySelectorAll('input, select, button[type="submit"]')
+        ).filter(el => !el.disabled && el.offsetParent !== null);
+
+        const currentIndex = focusables.indexOf(document.activeElement);
+        if (currentIndex === -1) return;
+
+        const next = focusables[currentIndex + direction];
+        if (next) {
+            next.focus();
+            if (typeof next.select === 'function' && next.tagName === 'INPUT' && next.type !== 'file') {
+                next.select();
+            }
+        }
+    };
+
+    const handleFormKeyDown = (e) => {
+        const target = e.target;
+
+        if (target.tagName === 'BUTTON') return;
+        if (target.type === 'file') return;
+        if (target.closest('.react-datepicker-wrapper')) return;
+
+        const isEnter = e.key === 'Enter';
+        const isArrowDown = e.key === 'ArrowDown';
+        const isArrowUp = e.key === 'ArrowUp';
+
+        if (!isEnter && !isArrowDown && !isArrowUp) return;
+        if (target.tagName === 'SELECT' && !isEnter) return;
+
+        e.preventDefault();
+        focusAdjacentField(isArrowUp ? -1 : 1);
+    };
+
 
     const historiaClinicaRef = useRef(null);
     const patologiaRef = useRef(null);
@@ -143,7 +194,7 @@ export default function Registro() {
                     Registro de incidencias
                 </h1>
                 <div className="border border-gray-200 rounded-b-lg px-8 py-8 shadow">
-                    <form onSubmit={submit} className="space-y-6">
+                    <form ref={formRef} onSubmit={submit} onKeyDown={handleFormKeyDown} className="space-y-6">
                         <h2 className="text-sm font-semibold text-teal-700 uppercase tracking-wider mb-2">
                             Identificación del paciente
                         </h2>
@@ -193,20 +244,65 @@ export default function Registro() {
                                 {errors.numero_documento && <p className="text-red-500 text-xs mt-1">{errors.numero_documento}</p>}
                             </div>
                         </div>
-                        <div className="relative">
-                            <div className={iconClass}>
-                                <svg xmlns="http://www.w3.org/2000/svg" className="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" /></svg>
-                            </div>
-                            <input
-                                type="text"
-                                placeholder="Nombre completo"
-                                value={data.nombre_completo}
-                                onChange={e => setData('nombre_completo', e.target.value.toUpperCase())}
-                                className={getInputClass(data.nombre_completo)}
-                            />
-                            {errors.nombre_completo && <p className="text-red-500 text-xs mt-1">{errors.nombre_completo}</p>}
-                        </div>
 
+                        {/* Nombres y apellidos separados */}
+                        <div className="grid grid-cols-2 gap-6">
+                            <div className="relative">
+                                <div className={iconClass}>
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" /></svg>
+                                </div>
+                                <input
+                                    type="text"
+                                    placeholder="Primer nombre"
+                                    value={data.nombre1}
+                                    onChange={e => setData('nombre1', e.target.value.toUpperCase())}
+                                    className={getInputClass(data.nombre1)}
+                                />
+                                {errors.nombre1 && <p className="text-red-500 text-xs mt-1">{errors.nombre1}</p>}
+                            </div>
+
+                            <div className="relative">
+                                <div className={iconClass}>
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" /></svg>
+                                </div>
+                                <input
+                                    type="text"
+                                    placeholder="Segundo nombre (opcional)"
+                                    value={data.nombre2}
+                                    onChange={e => setData('nombre2', e.target.value.toUpperCase())}
+                                    className={getInputClass(data.nombre2)}
+                                />
+                                {errors.nombre2 && <p className="text-red-500 text-xs mt-1">{errors.nombre2}</p>}
+                            </div>
+
+                            <div className="relative">
+                                <div className={iconClass}>
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" /></svg>
+                                </div>
+                                <input
+                                    type="text"
+                                    placeholder="Primer apellido"
+                                    value={data.apellido1}
+                                    onChange={e => setData('apellido1', e.target.value.toUpperCase())}
+                                    className={getInputClass(data.apellido1)}
+                                />
+                                {errors.apellido1 && <p className="text-red-500 text-xs mt-1">{errors.apellido1}</p>}
+                            </div>
+
+                            <div className="relative">
+                                <div className={iconClass}>
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" /></svg>
+                                </div>
+                                <input
+                                    type="text"
+                                    placeholder="Segundo apellido (opcional)"
+                                    value={data.apellido2}
+                                    onChange={e => setData('apellido2', e.target.value.toUpperCase())}
+                                    className={getInputClass(data.apellido2)}
+                                />
+                                {errors.apellido2 && <p className="text-red-500 text-xs mt-1">{errors.apellido2}</p>}
+                            </div>
+                        </div>
 
                         <h2 className="text-sm font-semibold text-teal-700 uppercase tracking-wider mb-2 mt-4">
                             Datos personales
@@ -335,7 +431,6 @@ export default function Registro() {
                             Información médica
                         </h2>
                         <div className="grid grid-cols-3 gap-6">
-
 
                             <div className="relative">
                                 <label className="block text-base text-gray-400 mb-1 ps-8">

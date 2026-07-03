@@ -12,7 +12,10 @@ class Paciente extends Model
     public $timestamps = false;
 
     protected $fillable = [
-        'nombre_completo',
+        'nombre1',
+        'nombre2',
+        'apellido1',
+        'apellido2',
         'tipo_documento',
         'numero_documento',
         'edad',
