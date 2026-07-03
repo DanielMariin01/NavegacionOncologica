@@ -88,7 +88,7 @@ class PacienteController extends Controller
                     'MPNom2'   => strtoupper($datos['nombre2'] ?? ''),
                     'MPApe1'   => strtoupper($datos['apellido1']),
                     'MPApe2'   => strtoupper($datos['apellido2'] ?? ''),
-                    'MPFchN'   => $datos['fecha_nacimiento'],
+                    'MPFchN'   => str_replace('-', '', $datos['fecha_nacimiento']),
                     'MPSexo'   => $datos['sexo'],
                 ]);
 
@@ -142,7 +142,7 @@ class PacienteController extends Controller
             return response()->json([
                 'existe'  => true,
                 'origen'  => 'local',
-                'mensaje' => 'Este paciente ya tiene incidencias registradas. Se autocompletaron los datos con su última incidencia.',
+                'mensaje' => 'Este paciente ya ha sido registrado con incidencias anteriormente. Se autocompletaron los datos.',
                 'datos'   => [
                     'tipo_documento'   => $ultimaIncidencia->tipo_documento,
                     'nombre1'          => $ultimaIncidencia->nombre1,
