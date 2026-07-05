@@ -11,8 +11,15 @@ use Illuminate\Support\Facades\Log;
 
 class PacienteController extends Controller
 {
+    private const CONTRATOS_EPS = [
+        'ASMET' => 'ESS062',
+        'SOS'   => 'IPS002PGP',
+    ];
+
     public function store(Request $request)
     {
+
+
         $request->validate([
             'nombre1'          => 'required|string|max:100',
             'nombre2'          => 'nullable|string|max:100',
@@ -60,6 +67,7 @@ class PacienteController extends Controller
         }
 
         DB::connection('mysql')->beginTransaction();
+        $sistemaFallido = null;
 
         try {
             $paciente = Paciente::create($datos);
@@ -68,6 +76,9 @@ class PacienteController extends Controller
                 'id_paciente'      => $paciente->id_paciente,
                 'numero_documento' => $datos['numero_documento'],
             ]);
+
+            // ---- CAPBAS ----
+            $sistemaFallido = 'CAPBAS';
 
             $existeEnCapbas = DB::connection('sqlsrv')
                 ->table('CAPBAS')
@@ -97,6 +108,44 @@ class PacienteController extends Controller
                 ]);
             }
 
+            // ---- MAEPAC ----
+            $sistemaFallido = 'MAEPAC';
+
+            $existeEnMaepac = DB::connection('sqlsrv')
+                ->table('MAEPAC')
+                ->where('MPCedu', $datos['numero_documento'])
+                ->exists();
+
+            Log::info('Incidencia@store - Verificación en MAEPAC', [
+                'numero_documento' => $datos['numero_documento'],
+                'ya_existe_maepac'  => $existeEnMaepac,
+            ]);
+
+            if (!$existeEnMaepac) {
+                $nombreEps = Auth::user()->nombre_eps;
+                $codigoContrato = self::CONTRATOS_EPS[$nombreEps] ?? null;
+
+                if (!$codigoContrato) {
+                    throw new \RuntimeException("No se encontró código de contrato MENNIT para la EPS '{$nombreEps}'.");
+                }
+                Log::info('Incidencia@store - EPS y contrato usados para MAEPAC', [
+                    'numero_documento' => $datos['numero_documento'],
+                    'nombre_eps'        => $nombreEps,
+                    'codigo_contrato'   => $codigoContrato,
+                ]);
+
+                DB::connection('sqlsrv')->table('MAEPAC')->insert([
+                    'MPCedu' => $datos['numero_documento'],
+                    'MPTDoc' => $datos['tipo_documento'],
+                    'MENNIT' => $codigoContrato,
+                ]);
+
+                Log::info('Incidencia@store - Paciente creado en MAEPAC', [
+                    'numero_documento' => $datos['numero_documento'],
+                ]);
+            }
+
+            $sistemaFallido = null;
             DB::connection('mysql')->commit();
 
             Log::info('Incidencia@store - Transacción completada exitosamente', [
@@ -106,7 +155,8 @@ class PacienteController extends Controller
         } catch (\Throwable $e) {
             Log::error('Incidencia@store - Falló el registro, se revierte todo', [
                 'numero_documento' => $datos['numero_documento'] ?? null,
-                'error'             => $e->getMessage(),
+                'sistema_fallido'  => $sistemaFallido,
+                'error'            => $e->getMessage(),
             ]);
 
             DB::connection('mysql')->rollBack();
@@ -116,11 +166,14 @@ class PacienteController extends Controller
                 }
             }
 
-            return back()->withErrors([
-                'general' => 'Ocurrió un error al registrar la incidencia. No se guardó ningún dato.',
-            ])->withInput();
-        }
+            $mensajeError = match ($sistemaFallido) {
+                'CAPBAS' => 'Ocurrió un error al registrar el paciente en CAPBAS. No se guardó ningún dato.',
+                'MAEPAC' => 'Ocurrió un error al registrar el paciente en MAEPAC. No se guardó ningún dato.',
+                default  => 'Ocurrió un error al registrar la incidencia. No se guardó ningún dato.',
+            };
 
+            return back()->withErrors(['general' => $mensajeError])->withInput();
+        }
         return redirect()->back()->with('success', 'Paciente registrado correctamente.');
     }
 
