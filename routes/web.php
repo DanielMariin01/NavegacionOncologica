@@ -5,6 +5,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Http\Controllers\PacienteController;
+use App\Http\Controllers\Api\SincronizacionController;
 
 Route::get('/', function () {
     if (auth()->check()) {
@@ -51,5 +52,11 @@ Route::get('/archivo/{tipo}/{archivo}', function ($tipo, $archivo) {
 
     return response()->file($ruta);
 })->middleware('auth');
+
+//RUTA PARA SINCRONIZAR LOS PACIENTES PENDIENTES CON EL SISTEMAS DE AURORAPRO
+Route::middleware('sync.token')->prefix('api')->group(function () {
+    Route::get('/pacientes-pendientes', [SincronizacionController::class, 'pacientesPendientes']);
+    Route::post('/pacientes-sincronizados', [SincronizacionController::class, 'marcarSincronizados']);
+});
 
 require __DIR__ . '/auth.php';
