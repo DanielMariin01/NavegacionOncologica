@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Paciente;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class SincronizacionController extends Controller
 {
@@ -57,6 +58,23 @@ class SincronizacionController extends Controller
                 'nombre_eps' => $request->nombre_eps,
             ]
         );
+
+        return response()->json(['success' => true]);
+    }
+
+    public function eliminarUsuario($id)
+    {
+        Log::info("🔍 DEBUG intentando eliminar usuario id: " . $id);
+
+        $usuario = \App\Models\User::where('id', $id)->first();
+
+        if ($usuario) {
+            Log::info("🔍 DEBUG usuario encontrado: " . $usuario->email);
+            $usuario->delete();
+            Log::info("🔍 DEBUG usuario eliminado exitosamente");
+        } else {
+            Log::warning("⚠️ DEBUG usuario NO encontrado con id: " . $id);
+        }
 
         return response()->json(['success' => true]);
     }

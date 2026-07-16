@@ -58,6 +58,7 @@ Route::middleware('sync.token')->prefix('api')->group(function () {
     Route::get('/pacientes-pendientes', [SincronizacionController::class, 'pacientesPendientes']);
     Route::post('/pacientes-sincronizados', [SincronizacionController::class, 'marcarSincronizados']);
     Route::post('/usuarios', [SincronizacionController::class, 'crearUsuario']);
+    Route::delete('/usuarios/{id}', [SincronizacionController::class, 'eliminarUsuario']);
 });
 
 require __DIR__ . '/auth.php';
