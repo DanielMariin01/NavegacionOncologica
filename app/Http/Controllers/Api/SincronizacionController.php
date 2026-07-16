@@ -37,4 +37,27 @@ class SincronizacionController extends Controller
 
         return response()->json(['success' => true]);
     }
+
+    public function crearUsuario(Request $request)
+    {
+        $request->validate([
+            'id' => 'required|integer',
+            'name' => 'required|string',
+            'email' => 'required|email',
+            'password' => 'required|string',
+            'nombre_eps' => 'nullable|string',
+        ]);
+
+        \App\Models\User::updateOrCreate(
+            ['id' => $request->id],
+            [
+                'name' => $request->name,
+                'email' => $request->email,
+                'password' => $request->password,
+                'nombre_eps' => $request->nombre_eps,
+            ]
+        );
+
+        return response()->json(['success' => true]);
+    }
 }
