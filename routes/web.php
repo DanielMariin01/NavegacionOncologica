@@ -36,7 +36,7 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-//RUTA PARA SERVIR LOS ARCHIVOS 
+//RUTA PARA SERVIR LOS ARCHIVOS (proxy desde AuroraPro, protegida por header, no por sesión)
 Route::get('/archivo/{tipo}/{archivo}', function ($tipo, $archivo) {
     $clave = request()->header('X-Archivo-Clave');
 
@@ -51,7 +51,7 @@ Route::get('/archivo/{tipo}/{archivo}', function ($tipo, $archivo) {
     }
 
     return response()->file($ruta);
-})->middleware('auth');
+});
 
 //RUTA PARA SINCRONIZAR LOS PACIENTES PENDIENTES CON EL SISTEMAS DE AURORAPRO
 Route::middleware('sync.token')->prefix('api')->group(function () {
